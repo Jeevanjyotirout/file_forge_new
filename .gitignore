@@ -12,15 +12,6 @@ build/
 venv/
 env/
 
-node_modules
-dist
-.env
-venv
-__pycache__
-*.pyc
-storage/uploads/*
-storage/output/*
-storage/temp/*
 # Node
 node_modules/
 frontend/dist/

@@ -1,17 +1,1630 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="FileForge – fast, secure file conversion and processing" />
-    <title>FileForge</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="FileForge — Free online file converter. Convert, compress, merge and process files instantly. No registration required." />
+  <meta name="keywords" content="PDF converter, compress image, zip file, image to PDF, file processing online" />
+  <meta property="og:title" content="FileForge — Free Online File Processor" />
+  <meta property="og:description" content="Convert, compress and process files in seconds. No signup needed." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23e53e3e'/><path d='M8 9h10l6 6v8H8V9z' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/><path d='M18 9v6h6' fill='none' stroke='white' stroke-width='1.8' stroke-linejoin='round'/><path d='M11 19h10M11 22h6' stroke='white' stroke-width='1.8' stroke-linecap='round'/></svg>" />
+  <title>FileForge — Free Online File Converter and Processor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ================================================================
+       DESIGN SYSTEM — clean professional light theme (ilovepdf style)
+    ================================================================ */
+    :root {
+      --white:         #ffffff;
+      --bg:            #f7f8fc;
+      --bg-alt:        #eef0f7;
+      --surface:       #ffffff;
+      --border:        #e2e5ef;
+      --border-hover:  #c5cbdf;
+
+      --text:          #111827;
+      --text-2:        #4b5563;
+      --text-3:        #9ca3af;
+
+      --red:           #e53e3e;
+      --red-soft:      #fff5f5;
+      --red-border:    #fed7d7;
+      --red-dark:      #c53030;
+
+      --green:         #16a34a;
+      --green-soft:    #f0fdf4;
+      --blue:          #2563eb;
+      --blue-soft:     #eff6ff;
+      --orange:        #ea580c;
+      --orange-soft:   #fff7ed;
+      --purple:        #7c3aed;
+      --purple-soft:   #f5f3ff;
+      --teal:          #0891b2;
+      --teal-soft:     #ecfeff;
+      --indigo:        #4f46e5;
+      --indigo-soft:   #eef2ff;
+
+      --sh-sm:  0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+      --sh-md:  0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+      --sh-lg:  0 12px 32px rgba(0,0,0,.10),0 4px 8px rgba(0,0,0,.05);
+
+      --r-sm:   8px;
+      --r:      12px;
+      --r-lg:   16px;
+      --r-xl:   24px;
+
+      --font:   'Plus Jakarta Sans', system-ui, sans-serif;
+      --mono:   'Geist Mono', 'Fira Code', monospace;
+      --ease:   0.18s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* Reset */
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { text-decoration:none; color:inherit; }
+    button { cursor:pointer; font-family:inherit; border:none; background:none; outline:none; }
+    ul,ol { list-style:none; }
+    img { display:block; max-width:100%; }
+
+    /* React root: hidden until React populates it */
+    #root { display:none; }
+    #root:not(:empty) { display:block; }
+
+    /* Layout */
+    .wrap { max-width:1140px; margin:0 auto; padding:0 20px; }
+
+    /* ── NAV ─────────────────────────────────────────────── */
+    .nav {
+      position: sticky; top:0; z-index:200;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: 60px;
+      display: flex; align-items: center;
+    }
+    .nav-inner {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      width: 100%; max-width:1140px;
+      margin:0 auto; padding:0 20px;
+    }
+    .logo {
+      display: flex; align-items: center; gap:9px;
+      font-weight:800; font-size:1.18rem;
+      letter-spacing:-0.03em; color:var(--text);
+      white-space: nowrap;
+    }
+    .logo-box {
+      width:32px; height:32px; border-radius:7px;
+      background:var(--red); flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .logo-box svg { width:17px; height:17px; }
+    .logo em { font-style:normal; color:var(--red); }
+
+    .nav-links {
+      display: flex; align-items:center; gap:2px;
+    }
+    .nav-links a {
+      font-size:0.86rem; font-weight:500;
+      color:var(--text-2); padding:6px 13px;
+      border-radius:var(--r-sm);
+      transition:background var(--ease), color var(--ease);
+      white-space:nowrap;
+    }
+    .nav-links a:hover { background:var(--bg); color:var(--text); }
+
+    .nav-right { display:flex; align-items:center; gap:10px; }
+    .nav-btn {
+      font-size:0.84rem; font-weight:700;
+      padding:8px 18px; border-radius:var(--r-sm);
+      background:var(--red); color:#fff;
+      box-shadow:0 1px 4px rgba(229,62,62,.25);
+      transition:background var(--ease), box-shadow var(--ease);
+      white-space:nowrap;
+    }
+    .nav-btn:hover { background:var(--red-dark); box-shadow:0 3px 10px rgba(229,62,62,.3); }
+
+    .hamburger { display:none; padding:6px; border-radius:var(--r-sm); }
+    .hamburger svg { width:22px; height:22px; color:var(--text-2); }
+
+    /* Mobile nav drawer */
+    .mob-nav {
+      display:none; position:fixed;
+      top:60px; left:0; right:0; z-index:199;
+      background:var(--white);
+      border-bottom:1px solid var(--border);
+      padding:10px 20px 16px;
+      box-shadow:var(--sh-md);
+    }
+    .mob-nav.open { display:block; }
+    .mob-nav a {
+      display:block; padding:11px 0;
+      font-size:0.9rem; font-weight:500;
+      color:var(--text-2);
+      border-bottom:1px solid var(--border);
+    }
+    .mob-nav a:last-child { border:none; }
+
+    /* ── HERO ────────────────────────────────────────────── */
+    .hero {
+      background:var(--white);
+      border-bottom:1px solid var(--border);
+      padding:52px 20px 48px;
+      text-align:center;
+    }
+    .hero-pill {
+      display:inline-flex; align-items:center; gap:7px;
+      background:var(--red-soft); border:1px solid var(--red-border);
+      border-radius:100px; padding:5px 15px;
+      font-family:var(--mono); font-size:0.76rem; font-weight:500;
+      color:var(--red); margin-bottom:20px;
+    }
+    .pill-dot {
+      width:6px; height:6px; border-radius:50%;
+      background:var(--red);
+      animation:blinkDot 2s ease-in-out infinite;
+    }
+    @keyframes blinkDot { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+    .hero h1 {
+      font-size:clamp(2rem, 5.5vw, 3.5rem);
+      font-weight:800; letter-spacing:-0.04em;
+      line-height:1.08; color:var(--text);
+      margin-bottom:16px;
+    }
+    .hero h1 span { color:var(--red); }
+    .hero p {
+      font-size:1rem; color:var(--text-2);
+      max-width:500px; margin:0 auto 28px;
+      font-weight:400; line-height:1.7;
+    }
+
+    .trust-row {
+      display:flex; align-items:center;
+      justify-content:center; gap:18px;
+      flex-wrap:wrap;
+      font-size:0.79rem; font-weight:500;
+      color:var(--text-3);
+    }
+    .trust-item { display:flex; align-items:center; gap:5px; }
+    .trust-item svg { width:14px; height:14px; color:var(--green); flex-shrink:0; }
+
+    /* ── TOOL CARDS ──────────────────────────────────────── */
+    .tools-sec { padding:52px 0 60px; }
+
+    .sec-eyebrow {
+      font-family:var(--mono); font-size:0.7rem; font-weight:600;
+      letter-spacing:.14em; text-transform:uppercase;
+      color:var(--red); margin-bottom:7px; display:block;
+    }
+    .sec-h2 {
+      font-size:clamp(1.5rem, 3.2vw, 2.1rem);
+      font-weight:800; letter-spacing:-0.035em;
+      color:var(--text); margin-bottom:5px;
+    }
+    .sec-sub {
+      font-size:0.9rem; color:var(--text-2);
+      margin-bottom:36px; font-weight:400;
+    }
+
+    .tool-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill, minmax(195px, 1fr));
+      gap:14px;
+    }
+
+    .tc {
+      background:var(--white);
+      border:1.5px solid var(--border);
+      border-radius:var(--r-lg);
+      padding:22px 18px 20px;
+      cursor:pointer;
+      display:flex; flex-direction:column;
+      align-items:center; text-align:center; gap:10px;
+      position:relative; overflow:hidden;
+      transition:transform var(--ease), border-color var(--ease), box-shadow var(--ease);
+    }
+    .tc::before {
+      content:''; position:absolute;
+      top:0; left:0; right:0; height:3px;
+      background:var(--tc-color, var(--red));
+      border-radius:3px 3px 0 0;
+      transform:scaleX(0);
+      transition:transform var(--ease);
+    }
+    .tc:hover { transform:translateY(-4px); border-color:var(--tc-color, var(--red)); box-shadow:var(--sh-lg); }
+    .tc:hover::before { transform:scaleX(1); }
+    .tc:focus-visible { outline:2px solid var(--tc-color, var(--red)); outline-offset:2px; }
+
+    .tc-icon {
+      width:50px; height:50px; border-radius:var(--r);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.5rem;
+      background:var(--tc-bg, var(--red-soft));
+      transition:transform var(--ease);
+    }
+    .tc:hover .tc-icon { transform:scale(1.1); }
+
+    .tc h3 { font-size:0.88rem; font-weight:700; color:var(--text); line-height:1.3; }
+    .tc p  { font-size:0.76rem; color:var(--text-3); line-height:1.5; font-weight:400; }
+
+    /* ── UPLOAD PANEL ────────────────────────────────────── */
+    .upload-sec { padding-bottom:60px; }
+
+    .panel {
+      background:var(--white);
+      border:1.5px solid var(--border);
+      border-radius:var(--r-xl);
+      box-shadow:var(--sh-md);
+      overflow:hidden;
+    }
+
+    /* Panel header */
+    .ph {
+      display:flex; align-items:center;
+      justify-content:space-between;
+      padding:16px 22px;
+      background:var(--bg);
+      border-bottom:1px solid var(--border);
+      flex-wrap:wrap; gap:12px;
+    }
+    .ph-left h2 {
+      font-size:0.97rem; font-weight:700;
+      color:var(--text); letter-spacing:-0.01em;
+    }
+    .ph-left span {
+      font-size:0.81rem; font-weight:400;
+      color:var(--text-3); margin-left:8px;
+    }
+    .ph-right {
+      display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    }
+    .be-status {
+      display:flex; align-items:center; gap:5px;
+      font-family:var(--mono); font-size:0.7rem; color:var(--text-3);
+    }
+    .be-dot {
+      width:7px; height:7px; border-radius:50%;
+      background:var(--border); flex-shrink:0;
+      transition:background .4s;
+    }
+    .be-dot.up   { background:var(--green); }
+    .be-dot.down { background:#f87171; }
+
+    .op-row { display:flex; align-items:center; gap:7px; }
+    .op-row label { font-size:0.79rem; font-weight:600; color:var(--text-2); white-space:nowrap; }
+    .op-sel {
+      font-family:var(--font); font-size:0.83rem; font-weight:500;
+      color:var(--text); background:var(--white);
+      border:1.5px solid var(--border);
+      border-radius:var(--r-sm);
+      padding:7px 32px 7px 11px;
+      appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 10px center;
+      cursor:pointer; outline:none;
+      transition:border-color var(--ease);
+    }
+    .op-sel:focus { border-color:var(--red); }
+
+    /* Drop zone */
+    .dz {
+      margin:18px;
+      border:2px dashed var(--border);
+      border-radius:var(--r-lg);
+      padding:46px 28px;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center; cursor:pointer;
+      min-height:210px;
+      transition:background var(--ease), border-color var(--ease);
+    }
+    .dz:hover, .dz.over {
+      background:var(--red-soft);
+      border-color:var(--red);
+    }
+    .dz.over { border-style:solid; }
+
+    .dz-ico {
+      width:58px; height:58px;
+      background:var(--red-soft); border-radius:var(--r-lg);
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:14px;
+      transition:transform var(--ease);
+    }
+    .dz:hover .dz-ico { transform:translateY(-3px); }
+    .dz-ico svg { width:26px; height:26px; color:var(--red); }
+
+    .dz-title { font-size:1rem; font-weight:700; color:var(--text); margin-bottom:5px; }
+    .dz-sub   { font-size:0.83rem; color:var(--text-3); margin-bottom:18px; }
+    .dz-sub a { color:var(--red); font-weight:600; }
+
+    .fmts { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+    .fmt  {
+      font-family:var(--mono); font-size:0.68rem;
+      padding:3px 9px; border-radius:100px;
+      background:var(--bg-alt); border:1px solid var(--border);
+      color:var(--text-3); font-weight:500;
+    }
+
+    /* Selected file row */
+    .sel-row {
+      display:none; align-items:center; gap:11px;
+      margin:0 18px 2px;
+      padding:13px 18px;
+      background:var(--bg); border-radius:var(--r);
+      border:1.5px solid var(--border);
+    }
+    .sel-row.show { display:flex; }
+    .sel-fi {
+      width:36px; height:36px; border-radius:8px;
+      background:var(--red-soft); flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .sel-fi svg { width:17px; height:17px; color:var(--red); }
+    .sel-info { flex:1; min-width:0; }
+    .sel-name { font-size:0.86rem; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .sel-meta { font-size:0.73rem; color:var(--text-3); font-family:var(--mono); }
+    .btn-clr {
+      width:27px; height:27px; border-radius:50%;
+      background:var(--border); flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      transition:background var(--ease);
+    }
+    .btn-clr:hover { background:var(--red-border); }
+    .btn-clr svg { width:13px; height:13px; color:var(--text-2); }
+
+    /* Progress bar */
+    .prg {
+      display:none; padding:14px 18px 2px;
+    }
+    .prg.show { display:block; }
+    .prg-hd {
+      display:flex; justify-content:space-between;
+      margin-bottom:7px;
+    }
+    .prg-lbl { font-size:0.81rem; font-weight:600; color:var(--text-2); }
+    .prg-pct { font-family:var(--mono); font-size:0.76rem; font-weight:600; color:var(--red); }
+    .prg-track {
+      height:6px; background:var(--bg-alt);
+      border-radius:100px; overflow:hidden;
+    }
+    .prg-fill {
+      height:100%; width:0%;
+      background:linear-gradient(90deg, var(--red), #f87171);
+      border-radius:100px;
+      transition:width .4s cubic-bezier(.16,1,.3,1);
+    }
+    .prg-note { font-size:0.73rem; color:var(--text-3); margin-top:5px; font-family:var(--mono); }
+
+    /* Processing indicator */
+    .proc {
+      display:none; align-items:center; gap:11px;
+      padding:14px 18px 2px;
+    }
+    .proc.show { display:flex; }
+    .spin {
+      width:19px; height:19px;
+      border:2.5px solid var(--border);
+      border-top-color:var(--red);
+      border-radius:50%; flex-shrink:0;
+      animation:spinAnim .75s linear infinite;
+    }
+    @keyframes spinAnim { to{transform:rotate(360deg)} }
+    .proc-txt { font-size:0.84rem; font-weight:500; color:var(--text-2); }
+
+    /* Success */
+    .ok-box {
+      display:none; align-items:center;
+      justify-content:space-between; flex-wrap:wrap; gap:14px;
+      margin:0 18px 2px;
+      padding:16px 18px;
+      background:var(--green-soft);
+      border:1.5px solid #86efac;
+      border-radius:var(--r);
+    }
+    .ok-box.show { display:flex; }
+    .ok-left { display:flex; align-items:center; gap:10px; }
+    .ok-chk {
+      width:34px; height:34px; border-radius:50%;
+      background:var(--green); flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .ok-chk svg { width:17px; height:17px; color:#fff; }
+    .ok-ttl { font-size:0.88rem; font-weight:700; color:#14532d; }
+    .ok-sub { font-size:0.75rem; color:#166534; }
+    .btn-dl {
+      display:inline-flex; align-items:center; gap:7px;
+      font-size:0.85rem; font-weight:700;
+      padding:10px 22px; border-radius:var(--r-sm);
+      background:var(--green); color:#fff;
+      box-shadow:0 2px 8px rgba(22,163,74,.25);
+      transition:background var(--ease), box-shadow var(--ease);
+    }
+    .btn-dl:hover { background:#15803d; box-shadow:0 4px 14px rgba(22,163,74,.35); }
+    .btn-dl svg { width:15px; height:15px; }
+
+    /* Error */
+    .err-box {
+      display:none; align-items:center; gap:10px;
+      margin:0 18px 2px;
+      padding:13px 18px;
+      background:var(--red-soft);
+      border:1.5px solid var(--red-border);
+      border-radius:var(--r);
+    }
+    .err-box.show { display:flex; }
+    .err-ico { width:18px; height:18px; color:var(--red); flex-shrink:0; }
+    .err-txt { font-size:0.82rem; font-weight:500; color:#991b1b; }
+
+    /* Panel footer */
+    .pf {
+      display:flex; align-items:center;
+      justify-content:space-between; flex-wrap:wrap;
+      gap:12px; padding:16px 18px 18px;
+    }
+    .pf-left { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .btn-up {
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:0.88rem; font-weight:700;
+      padding:11px 26px; border-radius:var(--r-sm);
+      background:var(--red); color:#fff;
+      box-shadow:0 2px 8px rgba(229,62,62,.28);
+      transition:background var(--ease), box-shadow var(--ease), transform var(--ease);
+    }
+    .btn-up:hover:not(:disabled) {
+      background:var(--red-dark);
+      box-shadow:0 4px 16px rgba(229,62,62,.38);
+      transform:translateY(-1px);
+    }
+    .btn-up:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-up svg { width:15px; height:15px; }
+
+    .btn-rst {
+      font-size:0.81rem; font-weight:600;
+      color:var(--text-3); padding:8px 14px;
+      border-radius:var(--r-sm);
+      border:1.5px solid var(--border);
+      display:none;
+      transition:color var(--ease), border-color var(--ease), background var(--ease);
+    }
+    .btn-rst:hover { color:var(--text-2); border-color:var(--border-hover); background:var(--bg); }
+
+    .pf-note {
+      font-size:0.73rem; color:var(--text-3);
+      display:flex; align-items:center; gap:5px;
+    }
+    .pf-note svg { width:12px; height:12px; flex-shrink:0; }
+
+    /* ── RECENT FILES TABLE ──────────────────────────────── */
+    .recent-sec { padding-bottom:60px; }
+
+    .rec-hd {
+      display:flex; align-items:center;
+      justify-content:space-between; flex-wrap:wrap;
+      gap:10px; margin-bottom:18px;
+    }
+    .rec-hd h2 { font-size:1rem; font-weight:700; color:var(--text); }
+
+    .btn-ref {
+      display:flex; align-items:center; gap:6px;
+      font-size:0.79rem; font-weight:600;
+      color:var(--text-2); padding:7px 14px;
+      border-radius:var(--r-sm);
+      border:1.5px solid var(--border);
+      transition:color var(--ease), border-color var(--ease), background var(--ease);
+    }
+    .btn-ref:hover { border-color:var(--border-hover); color:var(--text); background:var(--bg); }
+    .btn-ref svg { width:14px; height:14px; }
+    .btn-ref.spinning svg { animation:spinAnim .6s linear infinite; }
+
+    .t-wrap {
+      background:var(--white);
+      border:1.5px solid var(--border);
+      border-radius:var(--r-lg);
+      overflow:hidden;
+      box-shadow:var(--sh-sm);
+    }
+    table { width:100%; border-collapse:collapse; }
+    thead tr { background:var(--bg); border-bottom:1px solid var(--border); }
+    th {
+      text-align:left; padding:10px 15px;
+      font-family:var(--mono); font-size:0.69rem;
+      font-weight:700; letter-spacing:.06em;
+      text-transform:uppercase; color:var(--text-3);
+    }
+    tbody tr { border-bottom:1px solid var(--border); transition:background var(--ease); }
+    tbody tr:last-child { border:none; }
+    tbody tr:hover { background:#fafbfc; }
+    td { padding:11px 15px; font-size:0.83rem; color:var(--text-2); vertical-align:middle; }
+    .td-n { font-weight:600; color:var(--text); max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .td-op { font-family:var(--mono); font-size:0.74rem; }
+    .td-sz { font-family:var(--mono); font-size:0.74rem; }
+    .td-act { text-align:right; }
+
+    /* Status badges */
+    .badge {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:0.7rem; font-weight:700;
+      padding:3px 9px; border-radius:100px;
+      white-space:nowrap; letter-spacing:.01em;
+    }
+    .bd { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .b-pending  { background:#fef9c3; color:#713f12; }
+    .b-pending .bd  { background:#ca8a04; }
+    .b-proc { background:var(--blue-soft); color:#1e3a8a; animation:bPulse 1.5s ease-in-out infinite; }
+    .b-proc .bd { background:var(--blue); }
+    @keyframes bPulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .b-done { background:var(--green-soft); color:#14532d; }
+    .b-done .bd { background:var(--green); }
+    .b-err  { background:var(--red-soft); color:#7f1d1d; }
+    .b-err .bd  { background:var(--red); }
+
+    .btn-tdl {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:0.76rem; font-weight:700;
+      padding:5px 12px; border-radius:6px;
+      background:var(--green-soft); color:var(--green);
+      border:1px solid #86efac;
+      transition:background var(--ease), border-color var(--ease);
+    }
+    .btn-tdl:hover { background:#dcfce7; border-color:var(--green); }
+    .btn-tdl svg { width:12px; height:12px; }
+
+    .btn-tdel {
+      display:inline-flex; align-items:center;
+      padding:5px 7px; border-radius:6px;
+      color:var(--text-3); margin-left:4px;
+      transition:background var(--ease), color var(--ease);
+    }
+    .btn-tdel:hover { background:var(--red-soft); color:var(--red); }
+    .btn-tdel svg { width:14px; height:14px; }
+
+    .empty {
+      padding:44px 20px; text-align:center;
+    }
+    .empty svg { margin:0 auto 10px; }
+    .empty p { font-size:0.86rem; color:var(--text-3); }
+
+    /* ── FEATURES ────────────────────────────────────────── */
+    .feat-strip {
+      background:var(--white);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+      padding:44px 0;
+    }
+    .feat-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(195px, 1fr));
+      gap:28px;
+    }
+    .feat-item { display:flex; align-items:flex-start; gap:13px; }
+    .feat-ico {
+      width:40px; height:40px; border-radius:var(--r-sm);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.15rem; flex-shrink:0;
+    }
+    .feat-item h4 { font-size:0.88rem; font-weight:700; color:var(--text); margin-bottom:3px; }
+    .feat-item p  { font-size:0.78rem; color:var(--text-3); line-height:1.55; }
+
+    /* ── STEPS ───────────────────────────────────────────── */
+    .how-sec { padding:52px 0 60px; }
+    .steps-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(195px, 1fr));
+      gap:20px; margin-top:36px;
+    }
+    .step {
+      background:var(--white);
+      border:1.5px solid var(--border);
+      border-radius:var(--r-lg);
+      padding:22px 18px; text-align:center;
+      transition:box-shadow var(--ease), transform var(--ease);
+    }
+    .step:hover { box-shadow:var(--sh-md); transform:translateY(-2px); }
+    .step-n {
+      width:36px; height:36px; border-radius:50%;
+      background:var(--red-soft); color:var(--red);
+      font-size:0.9rem; font-weight:800;
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 12px;
+    }
+    .step h4 { font-size:0.88rem; font-weight:700; color:var(--text); margin-bottom:5px; }
+    .step p  { font-size:0.77rem; color:var(--text-3); line-height:1.55; }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    .footer {
+      background:var(--white);
+      border-top:1px solid var(--border);
+      padding:40px 0 26px;
+    }
+    .foot-grid {
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 1fr;
+      gap:40px; margin-bottom:32px;
+    }
+    .foot-brand p {
+      font-size:0.82rem; color:var(--text-3);
+      margin-top:11px; line-height:1.65;
+      max-width:230px; font-weight:400;
+    }
+    .foot-col h5 {
+      font-family:var(--mono); font-size:0.69rem;
+      font-weight:700; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--text-2);
+      margin-bottom:13px;
+    }
+    .foot-col a {
+      display:block; font-size:0.82rem;
+      color:var(--text-3); margin-bottom:8px;
+      font-weight:400; transition:color var(--ease);
+    }
+    .foot-col a:hover { color:var(--text); }
+    .foot-btm {
+      display:flex; align-items:center;
+      justify-content:space-between; flex-wrap:wrap;
+      gap:10px; padding-top:18px;
+      border-top:1px solid var(--border);
+    }
+    .foot-copy { font-family:var(--mono); font-size:0.75rem; color:var(--text-3); }
+    .foot-lnks { display:flex; gap:16px; }
+    .foot-lnks a { font-size:0.75rem; color:var(--text-3); transition:color var(--ease); }
+    .foot-lnks a:hover { color:var(--text); }
+
+    /* ── TOAST ───────────────────────────────────────────── */
+    #toasts {
+      position:fixed; bottom:22px; right:22px; z-index:9999;
+      display:flex; flex-direction:column; gap:8px;
+      pointer-events:none;
+    }
+    .t {
+      display:flex; align-items:center; gap:9px;
+      padding:11px 16px; border-radius:var(--r);
+      background:var(--text); color:#fff;
+      font-size:0.83rem; font-weight:500;
+      box-shadow:var(--sh-lg); max-width:310px;
+      pointer-events:all;
+      animation:tIn .28s cubic-bezier(.16,1,.3,1);
+    }
+    .t.ok  { background:var(--green); }
+    .t.bad { background:#dc2626; }
+    @keyframes tIn { from{transform:translateY(14px);opacity:0} to{transform:none;opacity:1} }
+    .t svg { width:15px; height:15px; flex-shrink:0; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media(max-width:900px) {
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .foot-grid { grid-template-columns:1fr 1fr; }
+      .foot-brand { grid-column:1/-1; }
+    }
+    @media(max-width:640px) {
+      .hero { padding:38px 20px 34px; }
+      .tool-grid { grid-template-columns:repeat(2,1fr); }
+      .ph { flex-direction:column; align-items:flex-start; }
+      .pf { flex-direction:column; align-items:stretch; }
+      .btn-up { justify-content:center; }
+      .ok-box { flex-direction:column; align-items:flex-start; }
+      .foot-grid { grid-template-columns:1fr; gap:22px; }
+      .foot-brand { grid-column:auto; }
+      thead th:nth-child(3), tbody td:nth-child(3) { display:none; }
+    }
+    @media(max-width:400px) {
+      .tool-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- React mounts here (invisible until React populates it) -->
+<div id="root"></div>
+
+<!-- ═══════════════ NAVIGATION ════════════════════════════ -->
+<header class="nav" role="banner">
+  <div class="nav-inner">
+
+    <a href="/" class="logo" aria-label="FileForge home">
+      <div class="logo-box" aria-hidden="true">
+        <svg viewBox="0 0 17 17" fill="none">
+          <path d="M2.5 2h7l4 4v9H2.5V2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M9.5 2v4h4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M5 10h7M5 12.5h4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      File<em>Forge</em>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="#tools">All Tools</a>
+      <a href="#upload">Upload</a>
+      <a href="#how">How it works</a>
+      <a href="/api/docs" target="_blank" rel="noopener">API Docs</a>
+      <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+
+    <div class="nav-right">
+      <a href="#upload" class="nav-btn">Start Free →</a>
+      <button class="hamburger" id="ham" aria-label="Open menu" aria-expanded="false">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="mob-nav" id="mobNav" aria-label="Mobile navigation" aria-hidden="true">
+  <a href="#tools"  onclick="closeMob()">All Tools</a>
+  <a href="#upload" onclick="closeMob()">Upload Files</a>
+  <a href="#how"    onclick="closeMob()">How it works</a>
+  <a href="/api/docs" target="_blank">API Docs</a>
+  <a href="https://github.com" target="_blank">GitHub</a>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════════════════════════ -->
+<section class="hero" aria-labelledby="h1">
+  <div class="hero-pill" role="status">
+    <span class="pill-dot" aria-hidden="true"></span>
+    Free · No signup · Auto-deleted in 1 hour
+  </div>
+  <h1 id="h1">The fastest way to<br><span>process any file</span></h1>
+  <p>Convert PDFs, compress images, zip files and more — instantly in the cloud. No watermarks, no size limits on the free plan.</p>
+  <div class="trust-row" role="list" aria-label="Guarantees">
+    <div class="trust-item" role="listitem">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      Up to 500 MB
+    </div>
+    <div class="trust-item" role="listitem">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      Encrypted in transit
+    </div>
+    <div class="trust-item" role="listitem">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      Files deleted in 1 hour
+    </div>
+    <div class="trust-item" role="listitem">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      Zero registration
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ TOOL CARDS ════════════════════════════ -->
+<section class="tools-sec wrap" id="tools" aria-labelledby="tools-h">
+  <span class="sec-eyebrow">Platform Tools</span>
+  <h2 class="sec-h2" id="tools-h">Choose a tool to get started</h2>
+  <p class="sec-sub">Click any card — it sets the operation and scrolls to the upload panel automatically.</p>
+
+  <div class="tool-grid" role="list">
+
+    <div class="tc" role="listitem" tabindex="0"
+      style="--tc-color:var(--indigo);--tc-bg:var(--indigo-soft);"
+      onclick="pickTool('copy','Copy / Save File')"
+      onkeydown="if(event.key==='Enter'||event.key===' ')pickTool('copy','Copy / Save File')">
+      <div class="tc-icon">📋</div>
+      <h3>Copy File</h3>
+      <p>Save an exact copy of any uploaded file</p>
+    </div>
+
+    <div class="tc" role="listitem" tabindex="0"
+      style="--tc-color:var(--orange);--tc-bg:var(--orange-soft);"
+      onclick="pickTool('compress-img','Compress Image')"
+      onkeydown="if(event.key==='Enter'||event.key===' ')pickTool('compress-img','Compress Image')">
+      <div class="tc-icon">🗜️</div>
+      <h3>Compress Image</h3>
+      <p>Reduce JPG, PNG or WebP up to 90% smaller</p>
+    </div>
+
+    <div class="tc" role="listitem" tabindex="0"
+      style="--tc-color:var(--red);--tc-bg:var(--red-soft);"
+      onclick="pickTool('img-to-pdf','Image to PDF')"
+      onkeydown="if(event.key==='Enter'||event.key===' ')pickTool('img-to-pdf','Image to PDF')">
+      <div class="tc-icon">🖼️</div>
+      <h3>Image to PDF</h3>
+      <p>Convert JPG or PNG images into a PDF document</p>
+    </div>
+
+    <div class="tc" role="listitem" tabindex="0"
+      style="--tc-color:var(--teal);--tc-bg:var(--teal-soft);"
+      onclick="pickTool('pdf-to-txt','PDF to Text')"
+      onkeydown="if(event.key==='Enter'||event.key===' ')pickTool('pdf-to-txt','PDF to Text')">
+      <div class="tc-icon">📄</div>
+      <h3>PDF to Text</h3>
+      <p>Extract all readable text from a PDF to .txt</p>
+    </div>
+
+    <div class="tc" role="listitem" tabindex="0"
+      style="--tc-color:var(--purple);--tc-bg:var(--purple-soft);"
+      onclick="pickTool('zip','Zip File')"
+      onkeydown="if(event.key==='Enter'||event.key===' ')pickTool('zip','Zip File')">
+      <div class="tc-icon">📦</div>
+      <h3>Zip File</h3>
+      <p>Package any file into a .zip archive instantly</p>
+    </div>
+
+    <div class="tc" role="listitem"
+      style="--tc-color:var(--green);--tc-bg:var(--green-soft);opacity:.5;cursor:default;"
+      title="AI tools coming soon" aria-disabled="true">
+      <div class="tc-icon">🤖</div>
+      <h3>AI Processing</h3>
+      <p>Document analysis &amp; summarisation — coming soon</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════ UPLOAD PANEL ══════════════════════════ -->
+<section class="upload-sec wrap" id="upload" aria-labelledby="up-h">
+  <div class="panel" role="region" aria-label="File upload and processing">
+
+    <!-- Header -->
+    <div class="ph">
+      <div class="ph-left">
+        <h2 id="up-h">Upload &amp; Process<span id="panelNote">— select a tool above or choose an operation below</span></h2>
+      </div>
+      <div class="ph-right">
+        <div class="be-status" aria-live="polite" aria-atomic="true">
+          <span class="be-dot" id="beDot" aria-hidden="true"></span>
+          <span id="beLabel">Connecting…</span>
+        </div>
+        <div class="op-row">
+          <label for="opSel">Operation:</label>
+          <select class="op-sel" id="opSel" aria-label="Choose processing operation">
+            <option value="copy">Copy file as-is</option>
+            <option value="compress-img">Compress image</option>
+            <option value="img-to-pdf">Image to PDF</option>
+            <option value="pdf-to-txt">PDF → Text extract</option>
+            <option value="zip">Zip file</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drop zone -->
+    <div class="dz" id="dz" role="button" tabindex="0"
+      aria-label="File drop zone — drag a file here or press Enter to browse">
+      <div class="dz-ico" aria-hidden="true">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 16 12 12 8 16"/>
+          <line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+        </svg>
+      </div>
+      <p class="dz-title">Drag &amp; drop your file here</p>
+      <p class="dz-sub">or <a href="#" id="browseA" role="button" tabindex="-1">click to browse</a> your device</p>
+      <div class="fmts" aria-label="Supported formats">
+        <span class="fmt">PDF</span><span class="fmt">DOCX</span>
+        <span class="fmt">JPG</span><span class="fmt">PNG</span>
+        <span class="fmt">WEBP</span><span class="fmt">XLSX</span>
+        <span class="fmt">ZIP</span><span class="fmt">TXT</span>
+        <span class="fmt">CSV</span><span class="fmt">+more</span>
+      </div>
+      <input type="file" id="fi" hidden aria-hidden="true" />
+    </div>
+
+    <!-- Selected file -->
+    <div class="sel-row" id="selRow" role="status" aria-live="polite">
+      <div class="sel-fi" aria-hidden="true">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <div class="sel-info">
+        <div class="sel-name" id="selName">—</div>
+        <div class="sel-meta" id="selMeta">—</div>
+      </div>
+      <button class="btn-clr" id="btnClr" aria-label="Remove file selection">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Progress -->
+    <div class="prg" id="prgArea" aria-live="polite">
+      <div class="prg-hd">
+        <span class="prg-lbl">Uploading…</span>
+        <span class="prg-pct" id="prgPct">0%</span>
+      </div>
+      <div class="prg-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="prgBar">
+        <div class="prg-fill" id="prgFill"></div>
+      </div>
+      <p class="prg-note" id="prgNote">Preparing…</p>
+    </div>
+
+    <!-- Processing -->
+    <div class="proc" id="procArea" aria-live="polite">
+      <div class="spin" aria-hidden="true"></div>
+      <span class="proc-txt" id="procTxt">Processing your file on the server…</span>
+    </div>
+
+    <!-- Success -->
+    <div class="ok-box" id="okBox" role="alert">
+      <div class="ok-left">
+        <div class="ok-chk" aria-hidden="true">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <div>
+          <div class="ok-ttl">File processed successfully!</div>
+          <div class="ok-sub" id="okSub">Ready to download</div>
+        </div>
+      </div>
+      <a class="btn-dl" id="dlBtn" href="#" download>
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="8 17 12 21 16 17"/>
+          <line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/>
+        </svg>
+        Download File
+      </a>
+    </div>
+
+    <!-- Error -->
+    <div class="err-box" id="errBox" role="alert">
+      <svg class="err-ico" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span class="err-txt" id="errTxt">Something went wrong. Please try again.</span>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="pf">
+      <div class="pf-left">
+        <button class="btn-up" id="btnUp" disabled aria-label="Upload and process the selected file">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="16 16 12 12 8 16"/>
+            <line x1="12" y1="12" x2="12" y2="21"/>
+            <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+          </svg>
+          <span id="btnUpLbl">Upload &amp; Process</span>
+        </button>
+        <button class="btn-rst" id="btnRst">Start over</button>
+      </div>
+      <div class="pf-note">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Max 500 MB · Deleted after 1 hour
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════ RECENT FILES ══════════════════════════ -->
+<section class="recent-sec wrap" id="recent" aria-labelledby="rec-h">
+  <div class="rec-hd">
+    <h2 id="rec-h">Recent Files</h2>
+    <button class="btn-ref" id="btnRef" aria-label="Refresh files list">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+      </svg>
+      Refresh
+    </button>
+  </div>
+  <div class="t-wrap" role="region" aria-label="Processing history" aria-live="polite">
+    <div class="empty" id="emptyEl">
+      <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="#d1d5db" stroke-width="1.4" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      <p>No files yet — upload one above to get started.</p>
+    </div>
+    <table id="ftbl" style="display:none" aria-label="Uploaded and processed files">
+      <thead>
+        <tr>
+          <th scope="col">File</th>
+          <th scope="col">Operation</th>
+          <th scope="col">Size</th>
+          <th scope="col">Status</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ftbd"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ FEATURES ══════════════════════════════ -->
+<div class="feat-strip" aria-label="Platform features">
+  <div class="wrap">
+    <div class="feat-grid" role="list">
+      <div class="feat-item" role="listitem">
+        <div class="feat-ico" style="background:var(--orange-soft);" aria-hidden="true">⚡</div>
+        <div>
+          <h4>Lightning Fast</h4>
+          <p>Redis-backed Celery workers process files in seconds with auto-scaling queues.</p>
+        </div>
+      </div>
+      <div class="feat-item" role="listitem">
+        <div class="feat-ico" style="background:var(--green-soft);" aria-hidden="true">🔒</div>
+        <div>
+          <h4>Private &amp; Secure</h4>
+          <p>Files encrypted in transit via HTTPS. Auto-purged from servers after 1 hour.</p>
+        </div>
+      </div>
+      <div class="feat-item" role="listitem">
+        <div class="feat-ico" style="background:var(--blue-soft);" aria-hidden="true">☁️</div>
+        <div>
+          <h4>Cloud Infrastructure</h4>
+          <p>Dockerised FastAPI + Nginx + Celery microservices with shared storage volumes.</p>
+        </div>
+      </div>
+      <div class="feat-item" role="listitem">
+        <div class="feat-ico" style="background:var(--purple-soft);" aria-hidden="true">🔗</div>
+        <div>
+          <h4>Open REST API</h4>
+          <p>Full Swagger docs at <code style="font-family:var(--mono);font-size:.85em;">/api/docs</code>. Integrate FileForge into any app.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ HOW IT WORKS ══════════════════════════ -->
+<section class="how-sec wrap" id="how" aria-labelledby="how-h">
+  <span class="sec-eyebrow">The Process</span>
+  <h2 class="sec-h2" id="how-h">How FileForge works</h2>
+  <p class="sec-sub">Four simple steps — upload to download in under 10 seconds.</p>
+  <div class="steps-grid" role="list">
+    <div class="step" role="listitem">
+      <div class="step-n" aria-hidden="true">1</div>
+      <h4>Upload your file</h4>
+      <p>Drag &amp; drop or browse up to 500 MB — any format accepted.</p>
+    </div>
+    <div class="step" role="listitem">
+      <div class="step-n" aria-hidden="true">2</div>
+      <h4>Choose operation</h4>
+      <p>Select from compress, convert, zip or copy. The server handles the rest.</p>
+    </div>
+    <div class="step" role="listitem">
+      <div class="step-n" aria-hidden="true">3</div>
+      <h4>Cloud processing</h4>
+      <p>A Celery worker picks up your job via Redis and processes it immediately.</p>
+    </div>
+    <div class="step" role="listitem">
+      <div class="step-n" aria-hidden="true">4</div>
+      <h4>Download result</h4>
+      <p>Click download the moment it's ready. File auto-deleted in 1 hour.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ════════════════════════════════ -->
+<footer class="footer" role="contentinfo">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="/" class="logo" aria-label="FileForge home">
+          <div class="logo-box" aria-hidden="true">
+            <svg viewBox="0 0 17 17" fill="none">
+              <path d="M2.5 2h7l4 4v9H2.5V2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M9.5 2v4h4" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M5 10h7M5 12.5h4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          File<em>Forge</em>
+        </a>
+        <p>Free cloud file converter and processor. No registration, no watermarks, no limits on the free plan.</p>
+      </div>
+      <nav class="foot-col" aria-label="Tools">
+        <h5>Tools</h5>
+        <a href="#" onclick="pickTool('compress-img','Compress Image');return false;">Compress Image</a>
+        <a href="#" onclick="pickTool('img-to-pdf','Image to PDF');return false;">Image to PDF</a>
+        <a href="#" onclick="pickTool('pdf-to-txt','PDF to Text');return false;">PDF to Text</a>
+        <a href="#" onclick="pickTool('zip','Zip File');return false;">Zip File</a>
+        <a href="#" onclick="pickTool('copy','Copy File');return false;">Copy File</a>
+      </nav>
+      <nav class="foot-col" aria-label="Developer resources">
+        <h5>Developers</h5>
+        <a href="/api/docs" target="_blank" rel="noopener">API Reference</a>
+        <a href="/api/health" target="_blank" rel="noopener">System Status</a>
+        <a href="/api/openapi.json" target="_blank" rel="noopener">OpenAPI JSON</a>
+        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+      <nav class="foot-col" aria-label="Info">
+        <h5>Info</h5>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="mailto:hello@fileforge.app">Contact</a>
+        <a href="/api/docs" target="_blank">Documentation</a>
+      </nav>
+    </div>
+    <div class="foot-btm">
+      <p class="foot-copy">© <span id="yr"></span> FileForge. All rights reserved.</p>
+      <div class="foot-lnks">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+        <a href="/api/docs" target="_blank">API</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast container -->
+<div id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Vite/React SPA entrypoint -->
+<script type="module" src="/src/main.jsx"></script>
+
+<!-- ══════════════════════════════════════════════════════════
+     VANILLA JS — Fully wired to FileForge FastAPI backend
+     ─────────────────────────────────────────────────────────
+     Backend API prefix: /api  (Nginx proxies → FastAPI :8000)
+
+     Endpoints consumed:
+       GET  /api/health/ping              → connectivity check
+       GET  /api/files/meta/operations   → load supported ops
+       POST /api/files/upload            → upload file + dispatch job
+       GET  /api/jobs/by-record/{id}     → poll job status (2 s interval)
+       GET  /api/files/{id}/download     → stream output file
+       GET  /api/files/?limit=20         → list recent records
+       DELETE /api/files/{id}            → delete record + files
+     ────────────────────────────────────────────────────────── -->
+<script>
+(function(){
+'use strict';
+
+/* ── Constants ──────────────────────────────────────────── */
+const API          = '/api';
+const MAX_FILE     = 500 * 1024 * 1024;   // 500 MB
+const POLL_MS      = 2000;
+const POLL_LIMIT   = 90;                  // 3 min
+
+/* ── State ──────────────────────────────────────────────── */
+let file       = null;
+let record     = null;
+let pollTmr    = null;
+let pollN      = 0;
+
+/* ── Helpers ────────────────────────────────────────────── */
+const G  = id => document.getElementById(id);
+const cl = (el, add, ...rem) => { el.classList.add(add); rem.forEach(c => el.classList.remove(c)); };
+const clOff = (el, ...rem) => rem.forEach(c => el.classList.remove(c));
+
+function fmtB(b){
+  if(!b) return '0 B';
+  const k=1024, s=['B','KB','MB','GB'];
+  const i=Math.floor(Math.log(b)/Math.log(k));
+  return parseFloat((b/Math.pow(k,i)).toFixed(1))+' '+s[i];
+}
+function esc(s){
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── DOM refs ───────────────────────────────────────────── */
+const dz       = G('dz');
+const fi       = G('fi');
+const browseA  = G('browseA');
+const opSel    = G('opSel');
+const btnUp    = G('btnUp');
+const btnUpLbl = G('btnUpLbl');
+const btnRst   = G('btnRst');
+const btnRef   = G('btnRef');
+const btnClr   = G('btnClr');
+const selRow   = G('selRow');
+const selName  = G('selName');
+const selMeta  = G('selMeta');
+const prgArea  = G('prgArea');
+const prgFill  = G('prgFill');
+const prgPct   = G('prgPct');
+const prgBar   = G('prgBar');
+const prgNote  = G('prgNote');
+const procArea = G('procArea');
+const procTxt  = G('procTxt');
+const okBox    = G('okBox');
+const okSub    = G('okSub');
+const dlBtn    = G('dlBtn');
+const errBox   = G('errBox');
+const errTxt   = G('errTxt');
+const beDot    = G('beDot');
+const beLabel  = G('beLabel');
+const emptyEl  = G('emptyEl');
+const ftbl     = G('ftbl');
+const ftbd     = G('ftbd');
+const panelNote= G('panelNote');
+
+/* ── Toast ──────────────────────────────────────────────── */
+function toast(msg, type=''){
+  const ic = {
+    ok:  '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    bad: '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    '': '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  };
+  const el = document.createElement('div');
+  el.className = 't' + (type ? ' '+type : '');
+  el.innerHTML = (ic[type]||ic['']) + `<span>${esc(msg)}</span>`;
+  G('toasts').appendChild(el);
+  setTimeout(()=>el.remove(), 4200);
+}
+
+/* ── Year ───────────────────────────────────────────────── */
+G('yr').textContent = new Date().getFullYear();
+
+/* ── Mobile nav ─────────────────────────────────────────── */
+const ham    = G('ham');
+const mobNav = G('mobNav');
+ham.addEventListener('click',()=>{
+  const o = mobNav.classList.toggle('open');
+  ham.setAttribute('aria-expanded', String(o));
+  mobNav.setAttribute('aria-hidden', String(!o));
+});
+document.addEventListener('click', e=>{
+  if(!ham.contains(e.target)&&!mobNav.contains(e.target)) closeMob();
+});
+function closeMob(){
+  mobNav.classList.remove('open');
+  ham.setAttribute('aria-expanded','false');
+  mobNav.setAttribute('aria-hidden','true');
+}
+window.closeMob = closeMob;
+
+/* ── Health check (GET /api/health/ping) ─────────────────── */
+async function healthCheck(){
+  try{
+    const r = await fetch(`${API}/health/ping`,{signal:AbortSignal.timeout(5000)});
+    if(r.ok){
+      beDot.className='be-dot up';
+      beLabel.textContent='Backend online';
+    } else throw 0;
+  } catch {
+    beDot.className='be-dot down';
+    beLabel.textContent='Backend offline';
+  }
+}
+healthCheck();
+setInterval(healthCheck, 30000);
+
+/* ── Load operations (GET /api/files/meta/operations) ────── */
+async function loadOps(){
+  try{
+    const r = await fetch(`${API}/files/meta/operations`);
+    if(!r.ok) return;
+    const {operations} = await r.json();
+    if(!operations) return;
+    opSel.innerHTML='';
+    Object.entries(operations).forEach(([k,v])=>{
+      const o=document.createElement('option');
+      o.value=k; o.textContent=v;
+      opSel.appendChild(o);
+    });
+  } catch{ /* use defaults */ }
+}
+loadOps();
+
+/* ── Tool card click ─────────────────────────────────────── */
+function pickTool(op, label){
+  opSel.value = op;
+  panelNote.textContent = `→ ${label}`;
+  G('upload').scrollIntoView({behavior:'smooth', block:'start'});
+  setTimeout(()=>dz.focus(), 380);
+}
+window.pickTool = pickTool;
+
+/* ── UI state manager ────────────────────────────────────── */
+function uiState(s){
+  // Hide all panels
+  clOff(prgArea, 'show');
+  clOff(procArea,'show');
+  clOff(okBox,   'show');
+  clOff(errBox,  'show');
+  btnRst.style.display = 'none';
+
+  if(s==='idle'){
+    btnUp.disabled = !file;
+  }
+  if(s==='uploading'){
+    btnUp.disabled = true;
+    cl(prgArea,'show');
+  }
+  if(s==='processing'){
+    btnUp.disabled = true;
+    cl(procArea,'show');
+  }
+  if(s==='done'){
+    btnUp.disabled = true;
+    cl(okBox,'show');
+    btnRst.style.display='inline-flex';
+  }
+  if(s==='error'){
+    btnUp.disabled = !file;
+    cl(errBox,'show');
+    btnRst.style.display='inline-flex';
+  }
+}
+
+/* ── File selection ──────────────────────────────────────── */
+function onFile(f){
+  if(!f) return;
+  if(f.size > MAX_FILE){
+    toast('File exceeds the 500 MB limit.','bad');
+    return;
+  }
+  file = f;
+  selName.textContent = f.name;
+  selMeta.textContent = `${fmtB(f.size)} · ${f.type||'unknown'}`;
+  cl(selRow,'show');
+  clOff(okBox,'show');
+  clOff(errBox,'show');
+  uiState('idle');
+}
+
+function clearFile(){
+  file=null; fi.value='';
+  clOff(selRow,'show');
+  selName.textContent='—';
+  selMeta.textContent='—';
+  uiState('idle');
+  btnUp.disabled=true;
+}
+
+/* Drop zone */
+dz.addEventListener('click', ()=>fi.click());
+browseA.addEventListener('click', e=>{ e.preventDefault(); fi.click(); });
+dz.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fi.click(); }});
+fi.addEventListener('change', ()=>{ if(fi.files[0]) onFile(fi.files[0]); });
+btnClr.addEventListener('click', clearFile);
+
+['dragenter','dragover'].forEach(ev=>{
+  dz.addEventListener(ev, e=>{ e.preventDefault(); cl(dz,'over'); });
+});
+['dragleave','dragend'].forEach(ev=>{
+  dz.addEventListener(ev, e=>{
+    if(!dz.contains(e.relatedTarget)) clOff(dz,'over');
+  });
+});
+dz.addEventListener('drop', e=>{
+  e.preventDefault();
+  clOff(dz,'over');
+  const f = e.dataTransfer?.files?.[0];
+  if(f) onFile(f);
+});
+
+/* ── Upload (POST /api/files/upload) ─────────────────────── */
+async function doUpload(){
+  if(!file){ toast('Please select a file first.','bad'); return; }
+  stopPoll();
+
+  uiState('uploading');
+  prgFill.style.width='0%';
+  prgPct.textContent='0%';
+  prgNote.textContent = file.name;
+  btnUpLbl.textContent = 'Uploading…';
+
+  const form = new FormData();
+  form.append('file', file);
+  form.append('operation', opSel.value);
+
+  try{
+    const rec = await new Promise((res,rej)=>{
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${API}/files/upload`);
+      xhr.setRequestHeader('Accept','application/json');
+
+      xhr.upload.addEventListener('progress', ev=>{
+        if(!ev.lengthComputable) return;
+        const p = Math.min(Math.round(ev.loaded/ev.total*100),99);
+        prgFill.style.width = p+'%';
+        prgPct.textContent  = p+'%';
+        prgBar.setAttribute('aria-valuenow', p);
+        prgNote.textContent = `${fmtB(ev.loaded)} / ${fmtB(ev.total)}`;
+      });
+
+      xhr.addEventListener('load',()=>{
+        if(xhr.status>=200&&xhr.status<300){
+          try{ res(JSON.parse(xhr.responseText)); }
+          catch{ rej(new Error('Invalid server response')); }
+        } else {
+          let d=`HTTP ${xhr.status}`;
+          try{ d=JSON.parse(xhr.responseText).detail||d; }catch{}
+          rej(new Error(d));
+        }
+      });
+      xhr.addEventListener('error',  ()=>rej(new Error('Network error — is the backend running?')));
+      xhr.addEventListener('timeout',()=>rej(new Error('Upload timed out (3 min)')));
+      xhr.timeout = 180000;
+      xhr.send(form);
+    });
+
+    // 100%
+    prgFill.style.width='100%';
+    prgPct.textContent='100%';
+    prgBar.setAttribute('aria-valuenow',100);
+
+    record = rec;
+    uiState('processing');
+    procTxt.textContent = `Processing "${file.name}" [${opSel.value}]…`;
+    btnUpLbl.textContent = 'Upload & Process';
+    startPoll(rec.id);
+
+  } catch(err){
+    uiState('error');
+    errTxt.textContent = err.message || 'Upload failed. Please try again.';
+    btnUpLbl.textContent = 'Upload & Process';
+    toast(err.message,'bad');
+  }
+}
+
+btnUp.addEventListener('click',()=>{
+  if(!file){ toast('Drop a file into the upload area first.','bad'); return; }
+  doUpload();
+});
+
+/* ── Job polling (GET /api/jobs/by-record/{id}) ──────────── */
+function stopPoll(){ if(pollTmr){ clearInterval(pollTmr); pollTmr=null; } pollN=0; }
+
+function startPoll(id){
+  stopPoll();
+  pollTmr = setInterval(()=>doPoll(id), POLL_MS);
+  doPoll(id);
+}
+
+async function doPoll(id){
+  pollN++;
+  if(pollN > POLL_LIMIT){
+    stopPoll();
+    uiState('error');
+    errTxt.textContent='Processing timed out (3 min). Please try again.';
+    toast('Processing timed out.','bad');
+    return;
+  }
+  try{
+    const r = await fetch(`${API}/jobs/by-record/${id}`);
+    if(!r.ok) return;
+    const data = await r.json();
+    const rec  = data.record;
+    if(!rec) return;
+    record = rec;
+
+    if(rec.status==='done'){
+      stopPoll();
+      dlBtn.href     = `${API}/files/${rec.id}/download`;
+      dlBtn.download = rec.output_name || 'output';
+      okSub.textContent = rec.output_name ? `Output: ${rec.output_name}` : 'Ready to download';
+      uiState('done');
+      toast('File ready — click Download!','ok');
+      loadFiles();
+
+    } else if(rec.status==='error'){
+      stopPoll();
+      uiState('error');
+      errTxt.textContent = rec.error_msg || 'Processing failed on the server.';
+      toast('Processing failed: '+(rec.error_msg||'unknown error'),'bad');
+
+    } else {
+      const dots='.'.repeat((pollN%4)+1);
+      procTxt.textContent = `Processing your file${dots}` +
+        (rec.job_id ? ` (job: ${rec.job_id.slice(0,8)})` : '');
+    }
+  } catch(e){ console.warn('[FF] poll error',e); }
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+function doReset(){
+  stopPoll();
+  clearFile();
+  record=null;
+  prgFill.style.width='0%';
+  prgPct.textContent='0%';
+  prgNote.textContent='Preparing…';
+  panelNote.textContent='— select a tool above or choose an operation below';
+  uiState('idle');
+  btnUp.disabled=true;
+}
+btnRst.addEventListener('click', doReset);
+
+/* ── Files table (GET /api/files/) ───────────────────────── */
+async function loadFiles(){
+  btnRef.classList.add('spinning');
+  try{
+    const r = await fetch(`${API}/files/?limit=20`);
+    if(!r.ok) throw 0;
+    const {records=[]} = await r.json();
+    renderFiles(records);
+  } catch(e){ console.warn('[FF] list error',e); }
+  finally{ btnRef.classList.remove('spinning'); }
+}
+
+function renderFiles(rows){
+  if(!rows.length){
+    emptyEl.style.display='block';
+    ftbl.style.display='none';
+    return;
+  }
+  emptyEl.style.display='none';
+  ftbl.style.display='table';
+  ftbd.innerHTML='';
+
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="td-n" title="${esc(r.original_name)}">${esc(r.original_name)}</td>
+      <td class="td-op">${esc(r.operation||'—')}</td>
+      <td class="td-sz">${fmtB(r.size_bytes)}</td>
+      <td>${badge(r.status)}</td>
+      <td class="td-act">
+        ${r.status==='done'
+          ? `<a class="btn-tdl" href="${API}/files/${esc(r.id)}/download" download title="Download result">
+               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
+               Download
+             </a>`
+          : ''}
+        <button class="btn-tdel" onclick="delFile('${esc(r.id)}')"
+          title="Delete" aria-label="Delete ${esc(r.original_name)}">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+          </svg>
+        </button>
+      </td>`;
+    ftbd.appendChild(tr);
+  });
+}
+
+function badge(s){
+  const m={
+    pending:    `<span class="badge b-pending"><span class="bd"></span>Pending</span>`,
+    processing: `<span class="badge b-proc"><span class="bd"></span>Processing</span>`,
+    done:       `<span class="badge b-done"><span class="bd"></span>Done</span>`,
+    error:      `<span class="badge b-err"><span class="bd"></span>Error</span>`,
+  };
+  return m[s]||`<span class="badge">${esc(s)}</span>`;
+}
+
+/* DELETE /api/files/{id} */
+async function delFile(id){
+  if(!confirm('Delete this file record and its files from the server?')) return;
+  try{
+    const r=await fetch(`${API}/files/${id}`,{method:'DELETE'});
+    if(r.ok){ toast('Record deleted.','ok'); loadFiles(); }
+    else      toast('Delete failed.','bad');
+  } catch { toast('Delete failed — network error.','bad'); }
+}
+window.delFile = delFile;
+
+btnRef.addEventListener('click', loadFiles);
+
+/* Auto-refresh table while any rows show "processing" */
+setInterval(()=>{
+  if(document.querySelector('.b-proc')) loadFiles();
+}, 5000);
+
+/* ── Initial load ────────────────────────────────────────── */
+uiState('idle');
+btnUp.disabled=true;
+loadFiles();
+
+})();
+</script>
+</body>
 </html>
