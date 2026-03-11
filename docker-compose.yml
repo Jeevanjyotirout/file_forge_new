@@ -1,0 +1,150 @@
+version: "3.9"
+
+# ── Shared network ────────────────────────────────────────────────────────────
+networks:
+  fileforge_net:
+    driver: bridge
+
+# ── Shared storage volume ─────────────────────────────────────────────────────
+volumes:
+  storage_data:
+    driver: local
+  redis_data:
+    driver: local
+  sqlite_data:
+    driver: local
+
+# ── Services ──────────────────────────────────────────────────────────────────
+services:
+
+  # ── Redis ──────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    networks:
+      - fileforge_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # ── Backend (FastAPI) ──────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_RESULT_URL=redis://redis:6379/1
+      - DATABASE_URL=sqlite:////app/storage/fileforge.db
+      - UPLOAD_DIR=/app/storage/uploads
+      - OUTPUT_DIR=/app/storage/outputs
+      - TEMP_DIR=/app/storage/temp
+    volumes:
+      - storage_data:/app/storage
+    networks:
+      - fileforge_net
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health/ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ── Celery Worker ──────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_RESULT_URL=redis://redis:6379/1
+      - DATABASE_URL=sqlite:////app/storage/fileforge.db
+      - UPLOAD_DIR=/app/storage/uploads
+      - OUTPUT_DIR=/app/storage/outputs
+      - TEMP_DIR=/app/storage/temp
+    volumes:
+      - storage_data:/app/storage
+    networks:
+      - fileforge_net
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
+  # ── Frontend (React + Vite → Nginx) ───────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - fileforge_net
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/index.html"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ── Nginx (reverse proxy) ──────────────────────────────────────────────────
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - fileforge_net
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/nginx-health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ── Flower (Celery monitoring – optional) ─────────────────────────────────
+  flower:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: >
+      celery -A app.celery_app flower
+      --port=5555
+      --basic_auth=${FLOWER_USER:-admin}:${FLOWER_PASSWORD:-fileforge}
+    env_file: .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_RESULT_URL=redis://redis:6379/1
+    ports:
+      - "5555:5555"
+    networks:
+      - fileforge_net
+    depends_on:
+      - redis
+      - worker
+    profiles:
+      - monitoring
